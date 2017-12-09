@@ -1,0 +1,38 @@
+#chess-game {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  background-color: #ffffff;
+}
+
+#chessboard {
+  position: relative;
+  box-sizing: border-box;
+  background-color: #cccccc;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  grid-template-rows: repeat(8, 1fr);
+  border: solid 1px #666666;
+}
+
+#actions-menu {
+  margin: 0;
+  padding: 20px;
+  display: flex;
+  position: absolute;
+  flex-direction: column;
+  align-self: flex-start;
+  z-index: 1;
+  background-color: inherit;
+}
+
+#actions-menu button {
+  margin: 5px 0;
+}
+
+#palettes-list {
+  cursor: default;
+}

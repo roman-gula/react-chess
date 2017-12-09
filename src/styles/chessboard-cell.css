@@ -1,0 +1,23 @@
+.chessboard-cell {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #ffffff;
+
+}
+.chessboard-cell:before {
+    display: inline-block;
+    content: '';
+    height: 0;
+    width: 0;
+    opacity: 0;
+}
+
+.cell-highlighted:before {
+    opacity: 1;
+    height: 85%;
+    width: 85%;
+    background-color: #42fe54;
+    transition: 200ms;
+}

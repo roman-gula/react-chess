@@ -1,0 +1,36 @@
+.color-list {
+    list-style-type: none;
+}
+
+.color-list li {
+    position: relative;
+    padding: 1px
+}
+
+.color-list label {
+    border: 1px solid #cccccc;
+    display: inline-flex;
+}
+
+.color-list label i {
+    position: relative;
+    display: inline-block;
+    height: 30px;
+    width: 30px;
+}
+.color-list :checked + label {
+    outline: 1px solid #999999;
+    outline-offset: 2px
+}
+
+.color-list input:focus + label {
+    outline: 2px solid #2394FF;
+    outline-offset: 1px
+}
+
+.color-list input {
+    height: 0;
+    margin: 0;
+    position: absolute;
+    opacity: 0;
+}
