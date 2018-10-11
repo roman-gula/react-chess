@@ -1,10 +1,13 @@
 import React from 'react';
 import '../../styles/figure.css';
 
-const MIN = 1;
-const MAX = 64;
+import settings from '../../settings';
+
+const { MIN_POSITION, MAX_POSITION, DIRECTIONS } = settings;
 
 class Figure extends React.Component {
+  directions = [];
+
   componentDidUpdate() {
     this.cellsToMove = this.getCellsToMove();
   }
@@ -17,61 +20,42 @@ class Figure extends React.Component {
     return this.props.position - (this.row - 1) * 8;
   }
 
-  getPossibleCells() {
-    return [];
-  }
+  getAllCellsByDirection(direction) {
+    const res = [];
 
-  moveRight() {
-    let res = [];
-    for (let i = 1; i <= 8 - this.column; i++) res.push(this.props.position + i);
-    return res;
-  }
+    switch (direction) {
+      case DIRECTIONS[0]:
+        for (let i = 1; i < this.column && i < this.row; i++) res.push(this.props.position - i * 9);
+        break;
+      case DIRECTIONS[1]:
+        for (let i = 1; i <= 8 - this.column && i < this.row; i++) res.push(this.props.position - i * 7);
+        break;
+      case DIRECTIONS[2]:
+        for (let i = 1; i < this.column && i <= 8 - this.row; i++) res.push(this.props.position + i * 7);
+        break;
+      case DIRECTIONS[3]:
+        for (let i = 1; i <= 8 - this.column && i <= 8 - this.row; i++) res.push(this.props.position + i * 9);
+        break;
+      case DIRECTIONS[4]:
+        for (let i = 1; i < this.column; i++) res.push(this.props.position - i);
+        break;
+      case DIRECTIONS[5]:
+        for (let i = 1; i <= 8 - this.column; i++) res.push(this.props.position + i);
+        break;
+      case DIRECTIONS[6]:
+        for (let i = 1; i < this.row; i++) res.push(this.props.position - i * 8);
+        break;
+      case DIRECTIONS[7]:
+        for (let i = 1; i <= 8 - this.row; i++) res.push(this.props.position + i * 8);
+        break;
+    }
 
-  moveLeft() {
-    let res = [];
-    for (let i = 1; i < this.column; i++) res.push(this.props.position - i);
-    return res;
-  }
-
-  moveBottom() {
-    let res = [];
-    for (let i = 1; i <= 8 - this.row; i++) res.push(this.props.position + i * 8);
-    return res;
-  }
-
-  moveTop() {
-    let res = [];
-    for (let i = 1; i < this.row; i++) res.push(this.props.position - i * 8);
-    return res;
-  }
-
-  moveRightBottom() {
-    let res = [];
-    for (let i = 1; i <= 8 - this.column && i <= 8 - this.row; i++) res.push(this.props.position + i * 9);
-    return res;
-  }
-
-  moveLeftBottom() {
-    let res = [];
-    for (let i = 1; i < this.column && i <= 8 - this.row; i++) res.push(this.props.position + i * 7);
-    return res;
-  }
-
-  moveLeftTop() {
-    let res = [];
-    for (let i = 1; i < this.column && i < this.row; i++) res.push(this.props.position - i * 9);
-    return res;
-  }
-
-  moveRightTop() {
-    let res = [];
-    for (let i = 1; i <= 8 - this.column && i < this.row; i++) res.push(this.props.position - i * 7);
     return res;
   }
 
   getCellsByDirection(direction) {
     let result = [];
-    let possibleCells = this['move' + direction]();
+    let possibleCells = this.getAllCellsByDirection(direction);
 
     if (!possibleCells.length) return result;
 
@@ -97,8 +81,6 @@ class Figure extends React.Component {
   }
 
   getCellsToMove() {
-    if (!this.directions || this.directions.length === 0) return [];
-
     let result = [];
 
     this.directions.forEach(direction => {
@@ -147,7 +129,7 @@ class Knight extends Figure {
   getPossibleCells() {
     let { position } = this.props;
 
-    if (position < MIN || position > MAX) throw new Error('Wrong position');
+    if (position < MIN_POSITION || position > MAX_POSITION) throw new Error('Wrong position');
 
     let res = [];
     let { column } = this;
@@ -172,7 +154,7 @@ class Knight extends Figure {
       }
     }
 
-    res = res.filter(item => item >= MIN && item <= MAX);
+    res = res.filter(item => item >= MIN_POSITION && item <= MAX_POSITION);
 
     return res;
   }
@@ -205,7 +187,9 @@ class Pawn extends Figure {
     let { isWhite, position, getCellFigure } = this.props;
     let possibleCells = this.getPossibleCells();
 
-    let beatCells = isWhite ? [this.moveLeftTop()[0], this.moveRightTop()[0]] : [this.moveLeftBottom()[0], this.moveRightBottom()[0]];
+    let beatCells = isWhite
+      ? [this.getAllCellsByDirection(DIRECTIONS[0])[0], this.getAllCellsByDirection(DIRECTIONS[1])[0]]
+      : [this.getAllCellsByDirection(DIRECTIONS[2])[0], this.getAllCellsByDirection(DIRECTIONS[3])[0]];
 
     possibleCells = possibleCells.concat(beatCells);
 
@@ -228,31 +212,21 @@ class Pawn extends Figure {
 }
 
 class Queen extends Figure {
-  get directions() {
-    return ['LeftTop', 'RightTop', 'LeftBottom', 'RightBottom', 'Left', 'Right', 'Top', 'Bottom'];
-  }
+  directions = DIRECTIONS;
 }
 
 class King extends Figure {
-  get directions() {
-    return ['LeftTop', 'RightTop', 'LeftBottom', 'RightBottom', 'Left', 'Right', 'Top', 'Bottom'];
-  }
+  directions = DIRECTIONS;
 
-  get stepMaxLength() {
-    return 1;
-  }
+  stepMaxLength = 1;
 }
 
 class Rook extends Figure {
-  get directions() {
-    return ['Left', 'Right', 'Top', 'Bottom'];
-  }
+  directions = DIRECTIONS.slice(4);
 }
 
 class Bishop extends Figure {
-  get directions() {
-    return ['LeftTop', 'RightTop', 'LeftBottom', 'RightBottom'];
-  }
+  directions = DIRECTIONS.slice(0, 4);
 }
 
 let Figures = { Knight, Pawn, Queen, Rook, Bishop, King };

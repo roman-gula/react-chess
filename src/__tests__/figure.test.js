@@ -5,19 +5,18 @@ import Adapter from 'enzyme-adapter-react-16';
 
 Enzyme.configure({ adapter: new Adapter() });
 
-const MIN_POSITION = 1;
-const MAX_POSITION = 64;
+import settings from '../settings';
+
+const { MIN_POSITION, MAX_POSITION, DIRECTIONS } = settings;
 
 test('Movement methods return valid positions', () => {
-  const METHODS = ['moveRight', 'moveLeft', 'moveBottom', 'moveTop', 'moveRightBottom', 'moveLeftBottom', 'moveLeftTop', 'moveRightTop'];
-
   for (let position = MIN_POSITION; position <= MAX_POSITION; position++) {
-    METHODS.forEach(methodName => {
+    DIRECTIONS.forEach(direction => {
       const component = shallow(<Figure position={position} />);
 
       let figure = component.instance();
 
-      let variants = figure[methodName]();
+      let variants = figure.getAllCellsByDirection(direction);
 
       let result = variants.every(inRange);
 
