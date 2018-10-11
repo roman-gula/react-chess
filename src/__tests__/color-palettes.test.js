@@ -3,10 +3,23 @@ import TestUtils from 'react-dom/test-utils';
 
 import ColorPalettes from '../components/color-palettes';
 
+// renderIntoDocument does not work with function components
+class Wrapper extends React.Component {
+  render() {
+    return this.props.children;
+  }
+}
+
 test('Palette component changes colors', () => {
   let palette;
 
-  const component = TestUtils.renderIntoDocument(<ColorPalettes setPalette={setPalette} />);
+  const setPalette = p => (palette = p);
+
+  const component = TestUtils.renderIntoDocument(
+    <Wrapper>
+      <ColorPalettes setPalette={setPalette} palette={palette} />
+    </Wrapper>
+  );
 
   let listItems = TestUtils.scryRenderedDOMComponentsWithTag(component, 'input');
 
@@ -17,8 +30,4 @@ test('Palette component changes colors', () => {
 
   expect(wColor).toEqual('#FFFFE0');
   expect(bColor).toEqual('#556B2F');
-
-  function setPalette(p) {
-    palette = p;
-  }
 });

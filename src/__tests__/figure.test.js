@@ -1,5 +1,5 @@
 import React from 'react';
-import { Figure } from '../components/figure';
+import { Figure } from '../components/figures/figure';
 import Enzyme, { shallow } from 'enzyme';
 import Adapter from 'enzyme-adapter-react-16';
 

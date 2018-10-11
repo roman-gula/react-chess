@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React from 'react';
 import '../styles/color-palettes.css';
 
 const PALETTES = [
@@ -14,40 +14,20 @@ const PALETTES = [
   ['#FFFFFF', '#00A6AC']
 ];
 
-class colorPalettes extends Component {
-  constructor(props) {
-    super(props);
+export default ({ setPalette, palette }) => {
+  if (!palette) setPalette(PALETTES[0]);
 
-    props.setPalette(PALETTES[0]);
-
-    this.state = { palette: PALETTES[0] };
-  }
-
-  onChange(palette) {
-    this.props.setPalette(palette);
-    this.setState({ palette });
-  }
-
-  render() {
-    return (
-      <ul className="color-list">
-        {PALETTES.map((palette, index) => {
-          let id = index + 1;
-          let checked = palette === this.state.palette;
-
-          return (
-            <li key={index}>
-              <input id={id} name="palette-colors" type="radio" onChange={() => this.onChange(palette)} checked={checked} />
-              <label htmlFor={id}>
-                <i style={{ backgroundColor: palette[0] }}> </i>
-                <i style={{ backgroundColor: palette[1] }}> </i>
-              </label>
-            </li>
-          );
-        })}
-      </ul>
-    );
-  }
-}
-
-export default colorPalettes;
+  return (
+    <ul className="color-list">
+      {PALETTES.map((item, index) => (
+        <li key={index}>
+          <input id={index + 1} name="palette-colors" type="radio" onChange={() => setPalette(item)} checked={item === palette} />
+          <label htmlFor={index + 1}>
+            <i style={{ backgroundColor: item[0] }}> </i>
+            <i style={{ backgroundColor: item[1] }}> </i>
+          </label>
+        </li>
+      ))}
+    </ul>
+  );
+};

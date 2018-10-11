@@ -32,10 +32,10 @@ class App extends React.Component {
 
     window.addEventListener('resize', this.setBoardSize.bind(this));
 
-    this.highLightCells = this.highLightCells.bind(this);
+    this.highlightCells = this.highlightCells.bind(this);
     this.moveFigure = this.moveFigure.bind(this);
-    this.getCellHasFigure = this.getCellHasFigure.bind(this);
-    this.disableHighLightCells = this.disableHighLightCells.bind(this);
+    this.getCellFigure = this.getCellFigure.bind(this);
+    this.disableHighlightCells = this.disableHighlightCells.bind(this);
     this.saveGame = this.saveGame.bind(this);
     this.deleteSavedData = this.deleteSavedData.bind(this);
     this.setPalette = this.setPalette.bind(this);
@@ -65,7 +65,7 @@ class App extends React.Component {
     this.turnNumber = turnNumber;
     this.isWhiteTurn = isWhiteTurn;
 
-    this.figures = figures === undefined ? getInitialFigures() : figures;
+    this.figures = figures || getInitialFigures();
 
     let cells = getCells(this.figures);
 
@@ -96,29 +96,29 @@ class App extends React.Component {
     this.turnNumber++;
   }
 
-  highLightCells(cellIndexes) {
+  highlightCells(cellIndexes) {
     let cells = this.state.cells;
 
     cellIndexes.forEach(index => {
       let cell = cells[index - 1];
 
-      cell.highLighted = true;
+      cell.highlighted = true;
     });
 
     this.setState({ cells });
   }
 
-  getCellHasFigure(cellIndex) {
+  getCellFigure(cellIndex) {
     let { figure } = this.state.cells[cellIndex - 1];
 
     return figure ? figure.isWhite : undefined;
   }
 
-  disableHighLightCells() {
+  disableHighlightCells() {
     let { cells } = this.state;
 
     cells.forEach(cell => {
-      cell.highLighted = false;
+      cell.highlighted = false;
     });
 
     this.setState({ cells });
@@ -144,7 +144,7 @@ class App extends React.Component {
 
     cellTo.figure = figure;
 
-    this.disableHighLightCells();
+    this.disableHighlightCells();
 
     this.changeTurn();
   }
@@ -155,11 +155,11 @@ class App extends React.Component {
     let {
       saveGame,
       isWhiteTurn,
-      highLightCells,
+      highlightCells,
       moveFigure,
       setPalette,
-      getCellHasFigure,
-      disableHighLightCells,
+      getCellFigure,
+      disableHighlightCells,
       turnNumber,
       deleteSavedData
     } = this;
@@ -189,23 +189,12 @@ class App extends React.Component {
           )}
           <details id="palettes-list">
             <summary>Change colors palette</summary>
-            <ColorPalettes setPalette={setPalette} />
+            <ColorPalettes setPalette={setPalette} palette={palette} />
           </details>
         </menu>
         {palette && (
           <section id="chessboard" style={{ height: boardSize, width: boardSize }}>
-            {cells.map(props => {
-              let isNext = props.figure ? props.figure.isWhite === isWhiteTurn : false;
-              let figureProps = {
-                highLightCells,
-                getCellHasFigure,
-                disableHighLightCells,
-                isNext
-              };
-              let cellProps = { palette, figureProps, moveFigure, ...props };
-
-              return <Cell {...cellProps} key={'cell' + props.index} />;
-            })}
+            {cells.map(cell => getCell(cell, isWhiteTurn, palette, moveFigure, highlightCells, getCellFigure, disableHighlightCells))}
           </section>
         )}
       </main>
@@ -214,6 +203,28 @@ class App extends React.Component {
 }
 
 export default App;
+
+function getCell({ index, figure, highlighted }, isWhiteTurn, palette, moveFigure, highlightCells, getCellFigure, disableHighlightCells) {
+  const cellProps = {
+    key: 'cell' + index,
+    index,
+    highlighted,
+    palette,
+    moveFigure
+  };
+
+  if (figure) {
+    cellProps.figure = figure;
+    cellProps.figureProps = {
+      isNext: figure.isWhite === isWhiteTurn,
+      highlightCells,
+      getCellFigure,
+      disableHighlightCells
+    };
+  }
+
+  return <Cell {...cellProps} />;
+}
 
 function getBoardSize() {
   return Math.min(window.innerWidth, window.innerHeight);
@@ -262,12 +273,12 @@ function getInitialFigures() {
     for (let type in item) {
       let data = item[type];
 
-      initFigure(type, false, data.black);
-      initFigure(type, true, data.white);
+      getFugure(type, false, data.black);
+      getFugure(type, true, data.white);
     }
   }
 
-  function initFigure(type, isWhite, initialPositions) {
+  function getFugure(type, isWhite, initialPositions) {
     initialPositions.forEach(initialPosition => {
       figures.push({
         type,
